@@ -1,31 +1,24 @@
-import { StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { getPin } from '../../lib/pinStore';
+import { Redirect } from 'expo-router';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function Index() {
+  const [loading, setLoading] = useState(true);
+  const [hasPin, setHasPin] = useState<boolean | null>(null);
 
-export default function TabOneScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
-  );
+  useEffect(() => {
+    const checkPin = async () => {
+      const pin = await getPin();
+      setHasPin(!!pin);
+      setLoading(false);
+    };
+    checkPin();
+  }, []);
+
+  if (loading) return null;
+
+  if (hasPin === false) return <Redirect href="/pin-setup" />;
+  if (hasPin === true) return <Redirect href="/pin-enter" />;
+
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
