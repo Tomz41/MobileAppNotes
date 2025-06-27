@@ -75,7 +75,7 @@ const handleSave = async () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000', padding: 20 }}>
+    <View style={{ flex: 1, backgroundColor: '#000', padding: 20, paddingTop: 35  }}>
       <TextInput
         placeholder="Заголовок (необязательно)"
         placeholderTextColor="#555"

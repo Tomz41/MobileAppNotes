@@ -1,17 +1,30 @@
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useFocusEffect, useRouter, useNavigation } from 'expo-router';
+import { useCallback, useState, useEffect } from 'react';
 import { FlatList, Text, View, Pressable, Alert } from 'react-native';
-import { getNotes, deleteNote, Note } from '../lib/notesStore';
-
-
-
-
+import { getNotes, deleteNote, Note } from '../../lib/notesStore';
+import { useLayoutEffect } from 'react';
+// Иконка (можно любую)
+import { Ionicons } from '@expo/vector-icons';
 
 export default function NotesList() {
   const [notes, setNotes] = useState<Note[]>([]);
   const router = useRouter();
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+  navigation.setOptions({
+    title: 'Мои Записи',
+    headerRight: () => (
+     <Pressable 
+  onPress={() => router.push('/settings')} 
+  style={{ transform: [{ translateX: -5}] }}
+>
+  <Ionicons name="settings-outline" size={24} color="white" />
+</Pressable>
 
-  
+    ),
+  });
+}, [navigation]);
+
 
   const loadNotes = async () => {
     const data = await getNotes();
@@ -57,13 +70,22 @@ export default function NotesList() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000', paddingTop: 30, paddingBottom: 30, }}>
-      <FlatList
-        data={notes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
+    <View style={{ flex: 1, backgroundColor: '#000',  }}>
+        {notes.length === 0 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+          <Text style={{ color: '#888', fontSize: 16, textAlign: 'center' }}>
+            Здесь пока нет записей,{'\n'}самое время добавить первую.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={notes}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      )}
+
       <Pressable
         onPress={() => router.push('/note/new')}
         style={{
@@ -84,6 +106,3 @@ export default function NotesList() {
   );
 }
 
-export const options = {
-  headerShown: false,
-};
